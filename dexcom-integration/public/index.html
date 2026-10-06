@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DiabetesBuddy — Dexcom Sandbox Test</title>
+<style>
+  body{font-family:-apple-system,sans-serif;max-width:480px;margin:60px auto;padding:0 20px;color:#2A3B2C;}
+  h1{font-size:20px;}
+  button{background:#4CAF50;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-size:15px;cursor:pointer;}
+  .reading{border-bottom:1px solid #E3F0E2;padding:8px 0;font-size:14px;}
+  .status{font-size:13px;color:#7E8F80;margin-bottom:16px;}
+</style>
+</head>
+<body>
+  <h1>DiabetesBuddy — Dexcom sandbox test</h1>
+  <div class="status" id="status">Checking connection…</div>
+  <button id="connectBtn">Connect Dexcom (sandbox)</button>
+  <div id="readings" style="margin-top:24px;"></div>
+
+<script>
+async function checkStatus(){
+  const res = await fetch('/api/status');
+  const { connected } = await res.json();
+  document.getElementById('status').textContent = connected
+    ? '✓ Connected to a Dexcom sandbox account'
+    : 'Not connected yet';
+  if (connected) loadReadings();
+}
+
+document.getElementById('connectBtn').addEventListener('click', () => {
+  window.location.href = '/auth/dexcom';
+});
+
+async function loadReadings(){
+  const res = await fetch('/api/glucose');
+  const data = await res.json();
+  if (!data.connected) return;
+  const container = document.getElementById('readings');
+  container.innerHTML = '<h3>Last 24h (real sandbox data)</h3>' +
+    data.readings.slice(-15).reverse().map(r =>
+      `<div class="reading">${new Date(r.time).toLocaleString()} — <b>${r.mmol} mmol/L</b> (${r.trend})</div>`
+    ).join('');
+}
+
+checkStatus();
+</script>
+</body>
+</html>

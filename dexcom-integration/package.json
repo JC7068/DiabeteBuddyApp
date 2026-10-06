@@ -1,0 +1,14 @@
+{
+  "name": "diabetesbuddy-dexcom-integration",
+  "version": "0.1.0",
+  "description": "Real Dexcom OAuth 2.0 sandbox integration for the DiabetesBuddy prototype",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0"
+  }
+}
