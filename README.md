@@ -5,17 +5,19 @@ one friendly app concept.
 
 ## Contents
 
-- **`app/index.html`** — the DiabetesBuddy prototype UI (self-contained HTML).
-  Home, Dexcom, OmniPod and Settings tabs, UK units (mmol/L). All data in this
-  version is simulated/hardcoded for demo purposes.
-- **`dexcom-integration/`** — a small Node/Express server implementing a real
-  Dexcom OAuth 2.0 sandbox integration (live simulated CGM data, not hardcoded).
-  See `dexcom-integration/README.md` for setup.
+- **`app/index.html`** — standalone offline demo. Open it directly in a
+  browser, zero setup. All data (including the Dexcom tab) is hardcoded —
+  useful for a quick look, screenshots, or anywhere Node isn't available.
+- **`dexcom-integration/`** — the real app. A Node/Express server that serves
+  the same UI but with Home and Dexcom tabs pulling **live data from Dexcom's
+  API** on every page load, via a proper OAuth 2.0 flow. See
+  `dexcom-integration/README.md` for setup. **This is the version to run** if
+  you want to see live glucose data rather than fixed numbers.
 
 ## Status
 
-- ✅ UI prototype — simulated data
-- ✅ Dexcom sandbox OAuth integration — real API, simulated sandbox data
+- ✅ UI prototype
+- ✅ Dexcom integration — real OAuth 2.0, live-fetched sandbox data (not hardcoded)
 - ❌ OmniPod live integration — not possible for a hobby project; see
   `dexcom-integration/README.md` for why (regulatory, not technical)
 

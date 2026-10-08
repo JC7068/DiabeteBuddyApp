@@ -1,9 +1,11 @@
-// DiabetesBuddy — Dexcom sandbox integration
+// DiabetesBuddy — full app, now wired to live Dexcom sandbox data
 //
-// A minimal server that performs the real Dexcom OAuth 2.0 authorization-code
-// flow and fetches live sandbox glucose readings. Run this locally — it is
-// not something that can run inside a browser-only page, because the token
+// Serves the DiabetesBuddy UI (public/index.html) and performs the real
+// Dexcom OAuth 2.0 authorization-code flow server-side, since the token
 // exchange requires a client secret that must never reach the browser.
+// Every time the app is opened, the Home and Dexcom tabs fetch fresh data
+// from Dexcom's API rather than using hardcoded numbers. OmniPod tab stays
+// simulated — see dexcom-integration/README.md for why.
 //
 // Setup:
 //   1. Register a free app at https://developer.dexcom.com
@@ -12,8 +14,9 @@
 //   2. Copy .env.example to .env and fill in your credentials
 //   3. npm install
 //   4. npm start
-//   5. Open http://localhost:3000 and click "Connect Dexcom"
-//      (Sandbox login needs no password — just pick a SandboxUser)
+//   5. Open http://localhost:3000 — if not yet connected, tap the banner
+//      at the top to connect (sandbox login needs no password — just pick
+//      a SandboxUser). Live data loads automatically from then on.
 
 const express = require('express');
 const axios = require('axios');
@@ -123,7 +126,20 @@ app.get('/api/glucose', async (req, res) => {
       trend: r.trend,
     }));
 
-    res.json({ connected: true, readings });
+    // Summary stats the UI needs: latest reading, trend, time-in-range
+    const latest = readings[readings.length - 1] || null;
+    const LOW = 3.9, HIGH = 10.0;
+    const inRange = readings.filter(r => r.mmol >= LOW && r.mmol <= HIGH).length;
+    const low = readings.filter(r => r.mmol < LOW).length;
+    const high = readings.filter(r => r.mmol > HIGH).length;
+    const pct = n => readings.length ? Math.round((n / readings.length) * 100) : 0;
+
+    res.json({
+      connected: true,
+      latest,
+      stats: { inRange: pct(inRange), low: pct(low), high: pct(high) },
+      readings, // most recent last
+    });
   } catch (err) {
     if (err.message.includes('Not connected')) {
       return res.json({ connected: false });

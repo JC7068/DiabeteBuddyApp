@@ -1,16 +1,24 @@
-# DiabetesBuddy — Dexcom sandbox integration
+# DiabetesBuddy — now with live Dexcom data
 
-A small Node/Express server demonstrating a real Dexcom OAuth 2.0 integration,
-built to sit behind the DiabetesBuddy UI prototype. This is separate from the
-prototype's published page because the OAuth token exchange needs a client
-secret, which can only ever live server-side — never in browser code.
+This server now serves the full DiabetesBuddy UI (`public/index.html`) and
+performs the real Dexcom OAuth 2.0 authorization-code flow, since the token
+exchange needs a client secret that can only ever live server-side.
 
 ## What this does
 
-- Performs the actual Dexcom OAuth 2.0 authorization-code flow
-- Fetches live *simulated* glucose data from Dexcom's sandbox (`sandbox-api.dexcom.com`)
+- Serves the actual DiabetesBuddy app — Home, Dexcom, OmniPod, Settings
+- Performs the real Dexcom OAuth 2.0 authorization-code flow
+- Every time you open the app, the Home and Dexcom tabs fetch **fresh data
+  from Dexcom's API** — nothing is hardcoded into the page anymore
 - Converts mg/dL → mmol/L to match the UK-style UI
 - Refreshes access tokens automatically when they're close to expiring
+- OmniPod tab stays simulated — see "Why there's no equivalent for OmniPod" below
+
+**Sandbox caveat:** Dexcom's sandbox serves a fixed simulated dataset, not a
+true real-time feed — so you'll get live-fetched data each time you open the
+app, but it's the same underlying sandbox history until Dexcom refreshes it.
+Swapping to a real production Dexcom account (see below) makes it genuinely
+live and changing.
 
 ## Setup
 
@@ -20,9 +28,11 @@ secret, which can only ever live server-side — never in browser code.
 2. `cp .env.example .env` and fill in your credentials
 3. `npm install`
 4. `npm start`
-5. Open `http://localhost:3000`, click **Connect Dexcom**, and pick any
+5. Open `http://localhost:3000` — you'll see the full app. If not yet
+   connected, a banner at the top prompts you to connect; pick any
    `SandboxUser1`–`6` on the consent screen (no password needed in sandbox)
-6. You'll see real (simulated) glucose readings pulled live from Dexcom's API
+6. Home and Dexcom tabs now populate with real (simulated) glucose data
+   pulled live from Dexcom's API every time you load the page
 
 ## Moving to production
 
